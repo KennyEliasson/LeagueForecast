@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html ng-app="forecastApp">
+<head>
+    <title>League forecast - Anticpate the outcome of your favorite football league</title>
+    <meta name="description" content="">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <!-- Bootstrap -->
+    <link href="content/css/bootstrap.min.css" rel="stylesheet">
+    <link href="content/css/rantan.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="logotype">
+                        <h1 class="color">League forecast</h1>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="description">
+
+                        <p>
+                            Fill out the remainding matches for the teams you're interested in and watch the league unfold.
+                        </p>
+
+                    </div>
+                </div>
+
+                <hr />
+
+            </div>
+
+        </div>
+    </header>
+
+    <div class="container">
+        
+		<div ng-view></div>
+
+        <div class="row">
+            <div class="col-xs-12 ads">
+                <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                <!-- Ränta -->
+                <ins class="adsbygoogle"
+                    style="display: inline-block; width: 320px; height: 100px"
+                    data-ad-client="ca-pub-5746005508466845"
+                    data-ad-slot="5290080130"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+    </div>
+
+
+
+    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+        <div class="container">
+            &copy; <a href="http://codespark.se">Codespark.se</a>
+        </div>
+    </nav>
+	
+	<script type="text/ng-template" id="pl.html">
+	
+		<div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span contenteditable>Premier league</span>
+                    </div>
+					
+					<div class="panel-body">
+                        <div class="row col-md-12">
+							<table>
+								<thead>
+								<tr>
+									<th></th>
+									<th></th>
+								</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="team in teams">
+										<td><a ng-click="showFixtures(team.id)">{{team.name}}</a></td>
+										<td>{{team.points}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
+					
+					<div class="panel-body" ng-if="viewFixtures=true">
+                        <div class="row col-md-12">
+							<table>
+								<thead>
+								<tr>
+									<th>Home</th>
+									<th>Away</th>
+									<th>Result</th>
+								</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="fixture in fixtures">
+										<td>{{fixture.home.name}}</td>
+										<td>{{fixture.away.name}}</td>
+										<td>
+											<input type="text" ng-change="fixture.calculate()" ng-model="fixture.homeScore" class="form-control" style="width:50px;display:inline;">
+											- 
+											<input type="text" ng-change="fixture.calculate()" ng-model="fixture.awayScore" class="form-control" style="width:50px;display:inline;">
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	
+	</script>
+	
+	<script type="text/ng-template" id="chooseleague.html">
+ 
+		<div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span contenteditable>Choose league</span>
+                    </div>
+					
+					<div class="panel-body">
+                        <div class="row col-md-12">
+							
+							
+							<a href="#/pl">PL</a>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+ 
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-route.js"></script>
+<!--
+    <script type="text/javascript">
+
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-46212289-1', 'azurewebsites.net');
+        ga('send', 'pageview');
+
+    </script>-->
+
+	<script src="content/js/angularLocalStorage.js?v=1"></script>
+	
+	
+    <script src="content/js/main.js?v=1"></script>
+
+</body>
+</html>
