@@ -1,53 +1,54 @@
-﻿var forecastApp = angular.module("forecastApp", ['ngRoute']);
+﻿var forecastApp = angular.module("forecastApp", ['ui.router']);
 
-forecastApp.config(['$routeProvider',
-  function($routeProvider) {
-    $routeProvider.
-      when('/pl', {
-        templateUrl: 'pl.html',
-        controller: 'PremierLeagueController'
-      }).
-      when('/', {
-        templateUrl: 'chooseleague.html',
-        controller: 'StartController'
-      }).
-	  otherwise({
-        redirectTo: '/'
-      });
-	  
+forecastApp.config(['$stateProvider', '$urlRouterProvider',
+  function($stateProvider, $urlRouterProvider) {
+  
+	$urlRouterProvider.otherwise("/");
+	$stateProvider
+    .state('league', {
+      url: "/league/:leagueName",
+      templateUrl: "pl.html",
+	  controller: 'PremierLeagueController'
+    }).state('league.team', {
+      url: "/team/:team/:teamId",
+      templateUrl: "fixtures.html",
+      controller: 'FixtureController'
+    }).state('index', {
+      url: "/",
+      templateUrl: "chooseleague.html",
+      controller: 'StartController'
+    });
+  
 }]);
 
 forecastApp.controller("StartController", ['$scope', '$location', function ($scope, $location) {
-
+	console.log('hej');
 }]);
 
 
-forecastApp.controller("PremierLeagueController", ['$scope', '$http', '$route', function ($scope, $http, $route) {
-
-
-	var league;
+forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams', function ($scope, $http, $stateParams) {
 	
-	$scope.$on('$routeChangeSuccess', function() {
+	var teamId = $stateParams.teamId;
 	
-		league = new League("Premier League");
-		$scope.teams = league.teams;
-		
-	});
-	
-	$scope.showFixtures = function(team) {
-		
-		var fixtures = [];
-		console.log(league);
-		for(var i = 0;i<league.fixtures.length;i++) {
-			if(league.fixtures[i].teamPlaying(team)) {
-				fixtures.push(league.fixtures[i]);
-			}
+	var fixtures = [];
+	for(var i = 0;i<league.fixtures.length;i++) {
+		if(league.fixtures[i].teamPlaying(teamId)) {
+			fixtures.push(league.fixtures[i]);
 		}
-		
-		$scope.fixtures = fixtures;
-		var viewFixtures = true;	
-	};
+	}
 	
+	$scope.fixtures = fixtures;
+}]);
+
+forecastApp.controller("PremierLeagueController", ['$scope', '$http', function ($scope, $http) {
+
+	league = new League("Premier League");
+	$scope.teams = league.teams;
+	$scope.fixtures = league.fixtures;
+	
+	$scope.points = function(team){
+		return team.points;
+	}
 }]);
 
 
@@ -57,28 +58,49 @@ var Fixture = function(home, away) {
  this.predicted = false;
  this.homeScore = '';
  this.awayScore = '';
+ 
+ this.scoreState = 0;
 }
 
 Fixture.prototype.teamPlaying = function(team){
-	return team === this.home.id || team === this.away.id;
+	var teamId = team;
+	if(team.id) {
+		teamId = team.id;
+	}
+	
+	return teamId == this.home.id || teamId == this.away.id;
 };
 
 Fixture.prototype.calculate = function(){
-	console.log('running!');
+	
+	//Simpel kod? :)
+	if(this.scoreState == 1) {
+		this.home.wins--;
+		this.away.defeats--;
+	} else if(this.scoreState == 2) {
+		this.home.defeats--;
+		this.away.wins--;
+	} else if(this.scoreState == "X") {
+		this.home.draws--;
+		this.away.draws--;
+	}
 	
 	if(this.homeScore > this.awayScore) {
 		this.home.wins++;
 		this.away.defeats++;
+		this.scoreState = 1;
 	} else if(this.homeScore < this.awayScore) {
 		this.home.defeats++;
 		this.away.wins++;
+		this.scoreState = 2;
 	} else {
 		this.home.draws++;
 		this.away.draws++;
+		this.scoreState = 'X';
 	}
 	
-	console.log(this.home);
-	
+	this.home.calculatePoints();
+	this.away.calculatePoints();
 };
 
 var Team = function(name, id) {
@@ -88,6 +110,11 @@ var Team = function(name, id) {
 	this.wins = 0;
 	this.draws = 0;
 	this.defeats = 0;
+	
+	this.calculatePoints = function(){
+		this.points = (this.wins*3)+(this.draws*1);
+		return this.points;
+	};
 }
 
 var League = function(name) {

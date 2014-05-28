@@ -51,7 +51,7 @@
 
     <div class="container">
         
-		<div ng-view></div>
+		<div ui-view></div>
 
         <div class="row">
             <div class="col-xs-12 ads">
@@ -91,49 +91,61 @@
 								<thead>
 								<tr>
 									<th></th>
-									<th></th>
+									<th>Points</th>
+									<th>Wins</th>
+									<th>Draws</th>
+									<th>Defeats</th>
+									<th>+/-</th>
 								</tr>
 								</thead>
 								<tbody>
-									<tr ng-repeat="team in teams">
-										<td><a ng-click="showFixtures(team.id)">{{team.name}}</a></td>
+									<tr ng-repeat="team in teams | orderBy:points:true">
+										<td><a href="#/league/pl/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
 										<td>{{team.points}}</td>
+										<td>{{team.wins}}</td>
+										<td>{{team.draws}}</td>
+										<td>{{team.defeats}}</td>
+										<td>-</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
 					</div>
 					
+					<div ui-view></div>
 					
-					<div class="panel-body" ng-if="viewFixtures=true">
-                        <div class="row col-md-12">
-							<table>
-								<thead>
-								<tr>
-									<th>Home</th>
-									<th>Away</th>
-									<th>Result</th>
-								</tr>
-								</thead>
-								<tbody>
-									<tr ng-repeat="fixture in fixtures">
-										<td>{{fixture.home.name}}</td>
-										<td>{{fixture.away.name}}</td>
-										<td>
-											<input type="text" ng-change="fixture.calculate()" ng-model="fixture.homeScore" class="form-control" style="width:50px;display:inline;">
-											- 
-											<input type="text" ng-change="fixture.calculate()" ng-model="fixture.awayScore" class="form-control" style="width:50px;display:inline;">
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
 					
 				</div>
 			</div>
 		</div>
 	
+	</script>
+	
+	<script type="text/ng-template" id="fixtures.html">
+		<div class="panel-body">
+			<div class="row col-md-12">
+				<table>
+					<thead>
+					<tr>
+						<th>Home</th>
+						<th>Away</th>
+						<th>Result</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="fixture in fixtures">
+							<td>{{fixture.home.name}}</td>
+							<td>{{fixture.away.name}}</td>
+							<td>
+								<input type="text" ng-change="fixture.calculate()" ng-model="fixture.homeScore" class="form-control" style="width:50px;display:inline;">
+								- 
+								<input type="text" ng-change="fixture.calculate()" ng-model="fixture.awayScore" class="form-control" style="width:50px;display:inline;">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</script>
 	
 	<script type="text/ng-template" id="chooseleague.html">
@@ -147,10 +159,7 @@
 					
 					<div class="panel-body">
                         <div class="row col-md-12">
-							
-							
-							<a href="#/pl">PL</a>
-							
+							<a href="#/league/pl">PL</a>
 						</div>
 					</div>
 				</div>
@@ -160,7 +169,8 @@
     </script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-route.js"></script>
+	<script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-route.js"></script>-->
 <!--
     <script type="text/javascript">
 
@@ -177,8 +187,6 @@
     </script>-->
 
 	<script src="content/js/angularLocalStorage.js?v=1"></script>
-	
-	
     <script src="content/js/main.js?v=1"></script>
 
 </body>
