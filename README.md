@@ -1,14 +1,4 @@
-rantan.se
+LeagueForecast
 =========
 
-Räntan.se
-
-
-
-
-Idéer
-
-
-Sparränta?
-
-Jag vill bli skuldfri om X månader, hur mycket måste jag betala?
+Gissa hur en liga kommer sluta och se tabellen uppdateras i realtid.
