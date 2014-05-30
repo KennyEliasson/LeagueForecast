@@ -8,7 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <!-- Bootstrap -->
     <link href="content/css/bootstrap.min.css" rel="stylesheet">
-    <link href="content/css/rantan.css" rel="stylesheet">
+    <link href="content/css/forecast.css" rel="stylesheet">
+	<link href="content/css/angular.rangeSlider.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -105,7 +106,7 @@
 										<td>{{team.wins}}</td>
 										<td>{{team.draws}}</td>
 										<td>{{team.defeats}}</td>
-										<td>-</td>
+										<td>{{team.scoreDiff}}</td>
 									</tr>
 								</tbody>
 							</table>
@@ -128,23 +129,26 @@
 					<thead>
 					<tr>
 						<th>Home</th>
+						<th></th>
 						<th>Away</th>
-						<th>Result</th>
 					</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="fixture in fixtures">
-							<td>{{fixture.home.name}}</td>
-							<td>{{fixture.away.name}}</td>
+						<tr ng-repeat="fixture in fixtures" ng-if="fixture.visible">
+							<td><a ng-click="fixture.incrementScore(true)">{{fixture.home.name}}</a></td>
 							<td>
 								<input type="text" ng-change="fixture.calculate()" ng-model="fixture.homeScore" class="form-control" style="width:50px;display:inline;">
 								- 
 								<input type="text" ng-change="fixture.calculate()" ng-model="fixture.awayScore" class="form-control" style="width:50px;display:inline;">
 							</td>
+							<td><a ng-click="fixture.incrementScore(false)">{{fixture.away.name}}</a></td>
+							
 						</tr>
 					</tbody>
 				</table>
 			</div>
+			<div range-slider min="0" max="dateRange.max" filter="kny" filter-options="{{dateRange.startDate}}" model-min="dateRange.from" model-max="dateRange.to"></div>
+			
 		</div>
 	</script>
 	
@@ -170,7 +174,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
 	<script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
-	<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-route.js"></script>-->
+	
 <!--
     <script type="text/javascript">
 
@@ -188,6 +192,7 @@
 
 	<script src="content/js/angularLocalStorage.js?v=1"></script>
     <script src="content/js/main.js?v=1"></script>
+	<script src="content/js/angular.rangeSlider.js?v=1"></script>
 
 </body>
 </html>

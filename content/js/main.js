@@ -1,4 +1,4 @@
-﻿var forecastApp = angular.module("forecastApp", ['ui.router']);
+﻿var forecastApp = angular.module("forecastApp", ['ui.router', 'ui-rangeSlider']);
 
 forecastApp.config(['$stateProvider', '$urlRouterProvider',
   function($stateProvider, $urlRouterProvider) {
@@ -21,13 +21,27 @@ forecastApp.config(['$stateProvider', '$urlRouterProvider',
   
 }]);
 
+
+
+forecastApp.filter('kny', function(){
+ return function(input, startDate) {
+ 
+ 
+ if (!(startDate instanceof Date)) {
+	startDate = new Date(parseInt(startDate));
+ }
+ 
+ return startDate.addDays(input).toReadableDate();
+
+ };
+});
+
 forecastApp.controller("StartController", ['$scope', '$location', function ($scope, $location) {
-	console.log('hej');
+	
 }]);
 
 
 forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams', function ($scope, $http, $stateParams) {
-	
 	var teamId = $stateParams.teamId;
 	
 	var fixtures = [];
@@ -37,7 +51,34 @@ forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams',
 		}
 	}
 	
+	$scope.dateRange = {
+		startDate: +league.startDate, //To Epoch
+		max: league.seasonLengthInDays,
+		from: 0,
+		to: league.seasonLengthInDays
+	};
+	
 	$scope.fixtures = fixtures;
+	
+	$scope.visibleFixtures = function(){
+		console.log('hello');
+		return $scope.fixtures.filter(function(n){
+			return n.visible;
+		});
+	};
+	
+	$scope.$watch("dateRange.from + dateRange.to", function() {
+		for(var i = 0;i<$scope.fixtures.length;i++) {
+			var fixture = $scope.fixtures[i];
+			
+			var start = league.startDate.addDays($scope.dateRange.from);
+			var end = league.startDate.addDays($scope.dateRange.to);
+			
+			fixture.visible = fixture.isPlayedBetween(start, end);
+		}
+	});
+	
+	
 }]);
 
 forecastApp.controller("PremierLeagueController", ['$scope', '$http', function ($scope, $http) {
@@ -47,61 +88,106 @@ forecastApp.controller("PremierLeagueController", ['$scope', '$http', function (
 	$scope.fixtures = league.fixtures;
 	
 	$scope.points = function(team){
-		return team.points;
+		return team.sortValue();
 	}
 }]);
 
 
-var Fixture = function(home, away) {
+var Fixture = function(home, away, date) {
+
+ this.date = date;
  this.home = home;
  this.away = away;
- this.predicted = false;
  this.homeScore = '';
  this.awayScore = '';
+ this.visible = true;
+ 
+ this.state = {
+	awayScore: 0,
+	homeScore: 0,
+	result: ""
+ };
  
  this.scoreState = 0;
-}
-
-Fixture.prototype.teamPlaying = function(team){
+ 
+ this.incrementScore = function(homeTeam){
+	if(homeTeam) {
+	 this.homeScore++;
+	} else {
+	 this.awayScore++;
+	}
+	
+	this.calculate();
+ };
+ 
+ this.teamPlaying = function(team){
 	var teamId = team;
 	if(team.id) {
 		teamId = team.id;
 	}
 	
 	return teamId == this.home.id || teamId == this.away.id;
-};
-
-Fixture.prototype.calculate = function(){
+ };
+ 
+ this.calculate = function(){
 	
 	//Simpel kod? :)
-	if(this.scoreState == 1) {
+	if(this.state.result == 1) {
 		this.home.wins--;
 		this.away.defeats--;
-	} else if(this.scoreState == 2) {
+	} else if(this.state.result == 2) {
 		this.home.defeats--;
 		this.away.wins--;
-	} else if(this.scoreState == "X") {
+	} else if(this.state.result == "X") {
 		this.home.draws--;
 		this.away.draws--;
 	}
 	
+	if(!this.homeScore) {
+		this.homeScore = 0;
+	}
+	
+	if(!this.awayScore) {
+		this.awayScore = 0;
+	}
+	
+	this.home.calculateScoreDiff(-(this.state.homeScore-this.state.awayScore));
+	this.away.calculateScoreDiff(-(this.state.awayScore-this.state.homeScore));
+
 	if(this.homeScore > this.awayScore) {
 		this.home.wins++;
 		this.away.defeats++;
-		this.scoreState = 1;
+		this.state.result = 1;
+		this.state.homeScore = this.homeScore;
 	} else if(this.homeScore < this.awayScore) {
 		this.home.defeats++;
 		this.away.wins++;
-		this.scoreState = 2;
+		this.state.result = 2;
 	} else {
 		this.home.draws++;
 		this.away.draws++;
-		this.scoreState = 'X';
+		this.state.result = 'X';
 	}
+	
+	this.state.homeScore = this.homeScore;
+	this.state.awayScore = this.awayScore;
+	
+	this.home.calculateScoreDiff(this.homeScore-this.awayScore);
+	this.away.calculateScoreDiff(this.awayScore-this.homeScore);
 	
 	this.home.calculatePoints();
 	this.away.calculatePoints();
-};
+ };
+ 
+ this.isPlayedBetween = function(start, end) {
+	if(!start) {
+		return;
+	}
+	
+	return this.date.between(start,end);
+ };
+}
+
 
 var Team = function(name, id) {
 	this.name = name;
@@ -111,14 +197,30 @@ var Team = function(name, id) {
 	this.draws = 0;
 	this.defeats = 0;
 	
-	this.calculatePoints = function(){
+	this.scoreDiff = 0;
+	
+	this.calculateScoreDiff = function(diff){
+		this.scoreDiff += diff;
+	};
+	
+	this.calculatePoints = function() {
 		this.points = (this.wins*3)+(this.draws*1);
 		return this.points;
+	};
+	
+	this.sortValue = function(){
+		return (this.points * 1000) + this.scoreDiff;
 	};
 }
 
 var League = function(name) {
 	this.name = name;
+	
+	this.startDate = new Date(2013, 8, 7);
+	var endDate = new Date(2014, 4, 23);
+
+	
+	this.seasonLengthInDays = this.startDate.daysTo(endDate);
 	
 	this.teams = [
 		new Team("Tottenham", 1),
@@ -128,15 +230,36 @@ var League = function(name) {
 	];
 	
 	this.fixtures = [
-		new Fixture(this.teams[0], this.teams[1]),
-		new Fixture(this.teams[0], this.teams[2]),
-		new Fixture(this.teams[0], this.teams[3]),
-		new Fixture(this.teams[1], this.teams[2]),
-		new Fixture(this.teams[1], this.teams[3]),
-		new Fixture(this.teams[2], this.teams[3])
+		new Fixture(this.teams[0], this.teams[1], new Date(2013,12,11)),
+		new Fixture(this.teams[0], this.teams[2], new Date(2014,2,9)),
+		new Fixture(this.teams[0], this.teams[3], new Date(2013,10,21)),
+		new Fixture(this.teams[1], this.teams[2], new Date(2014,3,24)),
+		new Fixture(this.teams[1], this.teams[3], new Date(2013,2,19)),
+		new Fixture(this.teams[2], this.teams[3], new Date(2013,11,30))
 	];
- 
-	
 };
 
 
+Date.prototype.daysTo = function(endDate) {
+	var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+	var diffDays = Math.round(Math.abs((this.getTime() - endDate.getTime())/(oneDay)));
+	return diffDays;
+};
+
+Date.prototype.addDays = function(days)
+{
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
+}
+
+Date.prototype.toReadableDate = function(){
+	var d = this.getDate();
+    var m = this.getMonth() + 1;
+    var y = this.getFullYear();
+    return '' + y + '-' + (m<=9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
+};
+
+Date.prototype.between = function(start, end){
+	return this.getTime() >= start.getTime() && this.getTime() <= end.getTime();
+};
