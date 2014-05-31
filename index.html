@@ -80,7 +80,7 @@
 	<script type="text/ng-template" id="pl.html">
 	
 		<div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <span contenteditable>Premier league</span>
@@ -88,19 +88,21 @@
 					
 					<div class="panel-body">
                         <div class="row col-md-12">
-							<table>
+							<table class="table table-condensed">
 								<thead>
 								<tr>
+									<th><input type="checkbox" ng-change="selectAll()" ng-model="allSelected"></th>
 									<th></th>
-									<th>Points</th>
-									<th>Wins</th>
-									<th>Draws</th>
-									<th>Defeats</th>
+									<th>W</th>
+									<th>D</th>
+									<th>L</th>
 									<th>+/-</th>
+									<th>PTS</th>
 								</tr>
 								</thead>
 								<tbody>
 									<tr ng-repeat="team in teams | orderBy:points:true">
+										<td><input type="checkbox" ng-change="updateFixtures()" ng-model="team.selected"></td>
 										<td><a href="#/league/pl/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
 										<td>{{team.points}}</td>
 										<td>{{team.wins}}</td>
@@ -113,43 +115,54 @@
 						</div>
 					</div>
 					
-					<div ui-view></div>
+				</div>
+			</div>
+			<div class="col-md-6">
+			
+			 <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span contenteditable>Fixtures</span>
+                    </div>
 					
+					<div class="panel-body">
+			
+						<table class="table table-condensed table-striped">
+							<thead>
+							<tr>
+								<th>Home</th>
+								<th></th>
+								<th>Away</th>
+							</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="fixture in fixtures" ng-if="fixture.visible">
+									<td><a ng-click="fixture.incrementScore(true)">{{fixture.home.name}}</a></td>
+									<td>
+										<input type="text" ng-change="fixture.calculate()" ng-model="fixture.homeScore" class="form-control input-sm" style="width:50px;display:inline;">
+										- 
+										<input type="text" ng-change="fixture.calculate()" ng-model="fixture.awayScore" class="form-control input-sm" style="width:50px;display:inline;">
+									</td>
+									<td><a ng-click="fixture.incrementScore(false)">{{fixture.away.name}}</a></td>
+									
+								</tr>
+							</tbody>
+						</table>
+			
+						<div range-slider on-handle-up="filterFixturesByDate()" min="0" max="dateRange.max" filter="toReadableDate" filter-options="{{dateRange.startDate}}" model-min="dateRange.from" model-max="dateRange.to"></div>
+			
+						</div>
+						<div ui-view></div>
 					
 				</div>
+			
+				
 			</div>
 		</div>
 	
 	</script>
 	
 	<script type="text/ng-template" id="fixtures.html">
-		<div class="panel-body">
-			<div class="row col-md-12">
-				<table>
-					<thead>
-					<tr>
-						<th>Home</th>
-						<th></th>
-						<th>Away</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="fixture in fixtures" ng-if="fixture.visible">
-							<td><a ng-click="fixture.incrementScore(true)">{{fixture.home.name}}</a></td>
-							<td>
-								<input type="text" ng-change="fixture.calculate()" ng-model="fixture.homeScore" class="form-control" style="width:50px;display:inline;">
-								- 
-								<input type="text" ng-change="fixture.calculate()" ng-model="fixture.awayScore" class="form-control" style="width:50px;display:inline;">
-							</td>
-							<td><a ng-click="fixture.incrementScore(false)">{{fixture.away.name}}</a></td>
-							
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div range-slider min="0" max="dateRange.max" filter="kny" filter-options="{{dateRange.startDate}}" model-min="dateRange.from" model-max="dateRange.to"></div>
-			
-		</div>
+		
 	</script>
 	
 	<script type="text/ng-template" id="chooseleague.html">

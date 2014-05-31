@@ -463,7 +463,7 @@
 
               function onUp(event, $handle) {
                 clickReference.mouseDown = false;
-
+console.log('hej');
                 if (angular.isFunction(scope.onHandleUp)) {
                   scope.onHandleUp();
                 }
