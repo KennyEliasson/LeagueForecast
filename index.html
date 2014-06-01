@@ -104,11 +104,11 @@
 									<tr ng-repeat="team in teams | orderBy:points:true">
 										<td><input type="checkbox" ng-change="updateFixtures()" ng-model="team.selected"></td>
 										<td><a href="#/league/pl/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
-										<td>{{team.points}}</td>
 										<td>{{team.wins}}</td>
 										<td>{{team.draws}}</td>
 										<td>{{team.defeats}}</td>
 										<td>{{team.scoreDiff}}</td>
+										<td>{{team.points}}</td>
 									</tr>
 								</tbody>
 							</table>
@@ -125,8 +125,12 @@
                     </div>
 					
 					<div class="panel-body">
+					
+						<div ng-hide="hasFixtures()">
+							No fixtures to show, choose a team from the table.
+						</div>
 			
-						<table class="table table-condensed table-striped">
+						<table class="table table-condensed table-striped" ng-show="hasFixtures()">
 							<thead>
 							<tr>
 								<th>Home</th>
@@ -148,7 +152,7 @@
 							</tbody>
 						</table>
 			
-						<div range-slider on-handle-up="filterFixturesByDate()" min="0" max="dateRange.max" filter="toReadableDate" filter-options="{{dateRange.startDate}}" model-min="dateRange.from" model-max="dateRange.to"></div>
+						<div ng-show="hasFixtures()" range-slider on-handle-up="filterFixturesByDate()" min="0" max="dateRange.max" filter="toReadableDate" filter-options="{{dateRange.startDate}}" model-min="dateRange.from" model-max="dateRange.to"></div>
 			
 						</div>
 						<div ui-view></div>
@@ -160,10 +164,7 @@
 		</div>
 	
 	</script>
-	
-	<script type="text/ng-template" id="fixtures.html">
-		
-	</script>
+
 	
 	<script type="text/ng-template" id="chooseleague.html">
  

@@ -8,17 +8,11 @@ forecastApp.config(['$stateProvider', '$urlRouterProvider',
     .state('league', {
       url: "/league/:leagueName",
       templateUrl: "pl.html",
-	  controller: 'PremierLeagueController'
+	  controller: 'LeagueController'
     }).state('league.team', {
       url: "/team/:team/:teamId",
-      templateUrl: "fixtures.html",
       controller: 'FixtureController'
-	}).state('league.team.fixtureDates', {
-      url: "/dates/:startDate",
-      templateUrl: "fixtures.html",
-      controller: 'FixtureControlleraa'
-    
-    }).state('index', {
+	}).state('index', {
       url: "/",
       templateUrl: "chooseleague.html",
       controller: 'StartController'
@@ -26,18 +20,16 @@ forecastApp.config(['$stateProvider', '$urlRouterProvider',
   
 }]);
 
-
-
 forecastApp.filter('toReadableDate', function(){
- return function(input, startDate) {
+	return function(input, startDate) {
  
- if (!(startDate instanceof Date)) {
-	startDate = new Date(parseInt(startDate));
- }
+		if (!(startDate instanceof Date)) {
+			startDate = new Date(parseInt(startDate));
+		}
  
- return startDate.addDays(input).toReadableDate();
+		return startDate.addDays(input).toReadableDate();
 
- };
+	};
 });
 
 forecastApp.controller("StartController", ['$scope', '$location', function ($scope, $location) {
@@ -45,12 +37,35 @@ forecastApp.controller("StartController", ['$scope', '$location', function ($sco
 }]);
 
 forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams', function ($scope, $http, $stateParams) {
-	console.log('just waiting');
+	$scope.setAllSelected(false);
+	
+	for(var i = 0;i<$scope.teams.length;i++) {
+		$scope.teams[i].selected = $scope.teams[i].id == $stateParams.teamId;
+	}
+	
+	$scope.updateFixtures();
 }]);
 
-forecastApp.controller("PremierLeagueController", ['$scope', '$http', function ($scope, $http) {
 
-	league = new League("Premier League");
+forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', function ($scope, $stateParams, $http) {
+
+	var league = $stateParams.leagueName;
+	if(league == "pl") {
+		league = new League("Premier League");
+		$http.get("content/data/pl/league.json").success(function(data) {
+			for(var i = 0;i<data.teams.length;i++) {
+				
+				league.addTeam(data.teams[i].name, data.teams[i].id);
+			}
+			$http.get("content/data/pl/fixures.json").success(function(fixtures){
+				for(var i = 0;i<fixtures.length;i++) {
+					league.addFixture(fixtures[i]);
+				}
+				league.calculateTable();
+			});
+		});
+	}
+
 	$scope.teams = league.teams;
 	$scope.fixtures = league.fixtures;
 	
@@ -58,7 +73,10 @@ forecastApp.controller("PremierLeagueController", ['$scope', '$http', function (
 		return team.sortValue();
 	}
 	
-	$scope.allSelected = true;
+	$scope.allSelected = false;
+	$scope.setAllSelected = function(state){
+		$scope.allSelected = state;
+	};
 	
 	$scope.selectAll = function(){
 		for(var i = 0;i<league.teams.length;i++) {
@@ -78,6 +96,7 @@ forecastApp.controller("PremierLeagueController", ['$scope', '$http', function (
 		var fixtures = [];
 		for(var i = 0;i<league.fixtures.length;i++) {
 			if(league.fixtures[i].teamsPlaying(selectedTeams)) {
+				league.fixtures[i].visible = true;
 				fixtures.push(league.fixtures[i]);
 			}
 		}
@@ -92,12 +111,15 @@ forecastApp.controller("PremierLeagueController", ['$scope', '$http', function (
 		from: 0,
 		to: league.seasonLengthInDays
 	};
-	
-	$scope.visibleFixtures = function(){
-		return $scope.fixtures.filter(function(n){
-			return n.visible;
-		});
-	};
+		
+	$scope.hasFixtures = function() {
+		for(var i = 0;i<$scope.fixtures.length;i++) {
+			if($scope.fixtures[i].visible)
+				return true;
+		}
+		
+		return false;
+	}
 	
 	$scope.filterFixturesByDate = function(){
 		var start = league.startDate.addDays($scope.dateRange.from);
@@ -112,14 +134,21 @@ forecastApp.controller("PremierLeagueController", ['$scope', '$http', function (
 }]);
 
 
-var Fixture = function(home, away, date) {
+var Fixture = function(home, away, date, scores) {
 
 	this.date = date;
 	this.home = home;
 	this.away = away;
-	this.homeScore = '';
-	this.awayScore = '';
-	this.visible = true;
+	
+	if(scores) {
+		this.homeScore = scores[0];
+		this.awayScore = scores[1];
+	} else {
+		this.homeScore = '';
+		this.awayScore = '';
+	}
+
+	this.visible = false;
  
 	this.state = {
 		awayScore: 0,
@@ -210,8 +239,7 @@ var Fixture = function(home, away, date) {
 		if(!start) {
 			return;
 		}
-		
-			return this.date.between(start,end);
+		return this.date.between(start,end);
 	};
 }
 
@@ -251,22 +279,27 @@ var League = function(name) {
 	
 	this.seasonLengthInDays = this.startDate.daysTo(endDate);
 	
-	this.teams = [
-		new Team("Tottenham", 1),
-		new Team("Arsenal", 2),
-		new Team("Liverpool", 3),
-		new Team("Manchester Utd", 4)
-	];
+	this.teamLookup = {};
+	this.teams = [];
+	this.fixtures = [];
 	
-	this.fixtures = [
-		new Fixture(this.teams[0], this.teams[1], new Date(2013,12,11)),
-		new Fixture(this.teams[0], this.teams[2], new Date(2014,2,9)),
-		new Fixture(this.teams[0], this.teams[3], new Date(2013,10,21)),
-		new Fixture(this.teams[1], this.teams[2], new Date(2014,3,24)),
-		new Fixture(this.teams[3], this.teams[2], new Date(2014,3,24)),
-		new Fixture(this.teams[1], this.teams[3], new Date(2013,2,19)),
-		new Fixture(this.teams[2], this.teams[3], new Date(2013,11,30))
-	];
+	this.addTeam = function(name, id){
+		var team = new Team(name, id);
+		this.teams.push(team);
+		this.teamLookup[name.replace(" ", "")] = team;
+	};
+	
+	this.addFixture = function(fixture) {
+		var homeTeam = this.teamLookup[fixture.home.replace(" ", "")];
+		var awayTeam = this.teamLookup[fixture.away.replace(" ", "")];
+		this.fixtures.push(new Fixture(homeTeam, awayTeam, new Date(fixture.date), [fixture.score.home, fixture.score.away]));
+	};
+	
+	this.calculateTable = function(){
+		for(var i = 0;i<this.fixtures.length;i++) {
+			this.fixtures[i].calculate();
+		}
+	};
 };
 
 
@@ -277,9 +310,9 @@ Date.prototype.daysTo = function(endDate) {
 };
 
 Date.prototype.addDays = function(days) {
-    var dat = new Date(this.valueOf());
-    dat.setDate(dat.getDate() + days);
-    return dat;
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
 }
 
 Date.prototype.toReadableDate = function(){
