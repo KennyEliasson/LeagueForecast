@@ -8,7 +8,30 @@ forecastApp.config(['$stateProvider', '$urlRouterProvider',
     .state('league', {
       url: "/league/:leagueName",
       templateUrl: "pl.html",
-	  controller: 'LeagueController'
+	  controller: 'LeagueController',
+	  resolve: {
+		league: function($stateParams, $http, $q){
+			var deferred = $q.defer();
+			
+			var leagueName = $stateParams.leagueName;
+		
+			$http.get("content/data/" + leagueName + "/league.json").success(function(data) {
+				var league = new League(data.name);
+				for(var i = 0;i<data.teams.length;i++) {
+					league.addTeam(data.teams[i].name, data.teams[i].id);
+				}
+				$http.get("content/data/" + leagueName + "/fixures.json").success(function(fixtures){
+					for(var i = 0;i<fixtures.length;i++) {
+						league.addFixture(fixtures[i]);
+					}
+					
+					deferred.resolve(league);
+				});
+			});
+			
+			return deferred.promise;
+		}
+	  }
     }).state('league.team', {
       url: "/team/:team/:teamId",
       controller: 'FixtureController'
@@ -22,13 +45,10 @@ forecastApp.config(['$stateProvider', '$urlRouterProvider',
 
 forecastApp.filter('toReadableDate', function(){
 	return function(input, startDate) {
- 
 		if (!(startDate instanceof Date)) {
 			startDate = new Date(parseInt(startDate));
 		}
- 
 		return startDate.addDays(input).toReadableDate();
-
 	};
 });
 
@@ -47,28 +67,19 @@ forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams',
 }]);
 
 
-forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', function ($scope, $stateParams, $http) {
+forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', 'league', function ($scope, $stateParams, $http, league) {
 
-	var league = $stateParams.leagueName;
-	if(league == "pl") {
-		league = new League("Premier League");
-		$http.get("content/data/pl/league.json").success(function(data) {
-			for(var i = 0;i<data.teams.length;i++) {
-				
-				league.addTeam(data.teams[i].name, data.teams[i].id);
-			}
-			$http.get("content/data/pl/fixures.json").success(function(fixtures){
-				for(var i = 0;i<fixtures.length;i++) {
-					league.addFixture(fixtures[i]);
-				}
-				league.calculateTable();
-			});
-		});
-	}
+	league.calculateTable();
 
 	$scope.teams = league.teams;
 	$scope.fixtures = league.fixtures;
-	
+	$scope.dateRange = {
+		startDate: +league.startDate, //To Epoch
+		max: league.seasonLengthInDays,
+		from: 0,
+		to: league.seasonLengthInDays
+	};
+
 	$scope.points = function(team){
 		return team.sortValue();
 	}
@@ -105,13 +116,6 @@ forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', f
 	
 	};
 	
-	$scope.dateRange = {
-		startDate: +league.startDate, //To Epoch
-		max: league.seasonLengthInDays,
-		from: 0,
-		to: league.seasonLengthInDays
-	};
-		
 	$scope.hasFixtures = function() {
 		for(var i = 0;i<$scope.fixtures.length;i++) {
 			if($scope.fixtures[i].visible)
@@ -186,6 +190,10 @@ var Fixture = function(home, away, date, scores) {
 	};
  
 	this.calculate = function(){
+	
+		if(!this.homeScore && !this.awayScore) {
+			return;
+		}
 		
 		//Simpel kod? :)
 		if(this.state.result == 1) {
@@ -290,8 +298,10 @@ var League = function(name) {
 	};
 	
 	this.addFixture = function(fixture) {
+	
 		var homeTeam = this.teamLookup[fixture.home.replace(" ", "")];
 		var awayTeam = this.teamLookup[fixture.away.replace(" ", "")];
+		
 		this.fixtures.push(new Fixture(homeTeam, awayTeam, new Date(fixture.date), [fixture.score.home, fixture.score.away]));
 	};
 	

@@ -103,7 +103,7 @@
 								<tbody>
 									<tr ng-repeat="team in teams | orderBy:points:true">
 										<td><input type="checkbox" ng-change="updateFixtures()" ng-model="team.selected"></td>
-										<td><a href="#/league/pl/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
+										<td><a href="#/league/{{league}}/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
 										<td>{{team.wins}}</td>
 										<td>{{team.draws}}</td>
 										<td>{{team.defeats}}</td>
@@ -177,7 +177,15 @@
 					
 					<div class="panel-body">
                         <div class="row col-md-12">
-							<a href="#/league/pl">PL</a>
+							<table class="table">
+								
+								<tbody>
+									<tr><td><a href="#/league/pl">Premier League</a></td></tr>
+									<tr><td><a href="#/league/allsvenskan">Allsvenskan</a></td></tr>
+								</tbody>
+							</table>
+							
+							
 						</div>
 					</div>
 				</div>
