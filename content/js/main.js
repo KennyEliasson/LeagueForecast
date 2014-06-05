@@ -69,7 +69,9 @@ forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams',
 
 forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', 'league', function ($scope, $stateParams, $http, league) {
 
+
 	league.calculateTable();
+	league.calculatePositionOfTeams({setStartPosition: true});
 
 	$scope.teams = league.teams;
 	$scope.fixtures = league.fixtures;
@@ -96,6 +98,11 @@ forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', '
 		
 		$scope.updateFixtures();
 	};
+	
+	$scope.calculatePositionOfTeams = function() {
+		league.calculatePositionOfTeams();
+	};
+
 	
 	$scope.updateFixtures = function() {
 		
@@ -189,8 +196,8 @@ var Fixture = function(home, away, date, scores) {
 		return teamId == this.home.id || teamId == this.away.id;
 	};
  
-	this.calculate = function(){
-	
+	this.calculate = function() {
+
 		if(!this.homeScore && !this.awayScore) {
 			return;
 		}
@@ -255,14 +262,10 @@ var Fixture = function(home, away, date, scores) {
 var Team = function(name, id) {
 	this.name = name;
 	this.id = id;
-	this.points = 0;
-	this.wins = 0;
-	this.draws = 0;
-	this.defeats = 0;
+	
+	this.ponts = this.wins = this.draws = this.defeats = this.startPosition = this.currentPosition = this.scoreDiff = 0;
 	
 	this.selected = false;
-	
-	this.scoreDiff = 0;
 	
 	this.calculateScoreDiff = function(diff){
 		this.scoreDiff += diff;
@@ -275,6 +278,14 @@ var Team = function(name, id) {
 	
 	this.sortValue = function(){
 		return (this.points * 1000) + this.scoreDiff;
+	};
+	
+	this.hasBetterPosition = function(){
+		return this.startPosition < this.currentPosition;
+	};
+	
+	this.hasWorsePosition = function(){
+		return this.startPosition > this.currentPosition;
 	};
 }
 
@@ -297,8 +308,17 @@ var League = function(name) {
 		this.teamLookup[name.replace(" ", "")] = team;
 	};
 	
-	this.addFixture = function(fixture) {
+	this.calculatePositionOfTeams = function(args) {
+		var sortedTeamsByPoints = this.teams.slice(0).sort(function(a, b) { return a.sortValue() - b.sortValue() });
+		for(var i = 0;i<sortedTeamsByPoints.length;i++) {
+			sortedTeamsByPoints[i].currentPosition = i+1;
+			if(args && args.setStartPosition) {
+				sortedTeamsByPoints[i].startPosition = i+1;
+			}
+		}
+	};
 	
+	this.addFixture = function(fixture) {
 		var homeTeam = this.teamLookup[fixture.home.replace(" ", "")];
 		var awayTeam = this.teamLookup[fixture.away.replace(" ", "")];
 		
@@ -335,3 +355,4 @@ Date.prototype.toReadableDate = function(){
 Date.prototype.between = function(start, end){
 	return this.getTime() >= start.getTime() && this.getTime() <= end.getTime();
 };
+

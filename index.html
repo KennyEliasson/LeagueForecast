@@ -92,6 +92,8 @@
 								<thead>
 								<tr>
 									<th><input type="checkbox" ng-change="selectAll()" ng-model="allSelected"></th>
+									<th>#</th>
+									<th></th>
 									<th></th>
 									<th>W</th>
 									<th>D</th>
@@ -103,6 +105,8 @@
 								<tbody>
 									<tr ng-repeat="team in teams | orderBy:points:true">
 										<td><input type="checkbox" ng-change="updateFixtures()" ng-model="team.selected"></td>
+										<td>{{$index+1}}</td>
+										<td><span class="label" ng-class="{'label-success': team.hasBetterPosition(), 'label-danger': team.hasWorsePosition() }">{{team.currentPosition-team.startPosition}}</span></td>
 										<td><a href="#/league/{{league}}/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
 										<td>{{team.wins}}</td>
 										<td>{{team.draws}}</td>
@@ -140,13 +144,13 @@
 							</thead>
 							<tbody>
 								<tr ng-repeat="fixture in fixtures" ng-if="fixture.visible">
-									<td><a ng-click="fixture.incrementScore(true)">{{fixture.home.name}}</a></td>
+									<td><a ng-click="fixture.incrementScore(true);calculatePositionOfTeams()">{{fixture.home.name}}</a></td>
 									<td>
-										<input type="text" ng-change="fixture.calculate()" ng-model="fixture.homeScore" class="form-control input-sm" style="width:50px;display:inline;">
+										<input type="text" ng-change="fixture.calculate();calculatePositionOfTeams()" ng-model="fixture.homeScore" class="form-control input-sm" style="width:50px;display:inline;">
 										- 
-										<input type="text" ng-change="fixture.calculate()" ng-model="fixture.awayScore" class="form-control input-sm" style="width:50px;display:inline;">
+										<input type="text" ng-change="fixture.calculate();calculatePositionOfTeams()" ng-model="fixture.awayScore" class="form-control input-sm" style="width:50px;display:inline;">
 									</td>
-									<td><a ng-click="fixture.incrementScore(false)">{{fixture.away.name}}</a></td>
+									<td><a ng-click="fixture.incrementScore(false);calculatePositionOfTeams()">{{fixture.away.name}}</a></td>
 									
 								</tr>
 							</tbody>
