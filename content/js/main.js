@@ -154,6 +154,8 @@ var Fixture = function(home, away, date, scores) {
 	if(scores) {
 		this.homeScore = scores[0];
 		this.awayScore = scores[1];
+		this.originalHomeScore = this.homeScore;
+		this.originalAwayScore = this.awayScore;
 	} else {
 		this.homeScore = '';
 		this.awayScore = '';
@@ -176,7 +178,7 @@ var Fixture = function(home, away, date, scores) {
 			this.awayScore++;
 		}
 
-		this.calculate();
+		this.calculatScore();
 	};
 	
 	this.teamsPlaying = function(teams){
@@ -194,6 +196,11 @@ var Fixture = function(home, away, date, scores) {
 		}
 		
 		return teamId == this.home.id || teamId == this.away.id;
+	};
+	
+	this.calculatScore = function(){
+		this.changed = true;
+		this.calculate();
 	};
  
 	this.calculate = function() {
