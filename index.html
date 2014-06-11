@@ -5,6 +5,7 @@
     <meta name="description" content="">
 
     <meta charset="utf-8">
+	
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <!-- Bootstrap -->
     <link href="content/css/bootstrap.min.css" rel="stylesheet">
@@ -23,10 +24,17 @@
 </head>
 <body>
 
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    
+  </div>
+</nav>
+
+
     <header>
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-sm-12">
                     <div class="logotype">
                         <h1 class="color">League forecast</h1>
                     </div>
@@ -35,7 +43,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-12 col-sm-12">
+                <div class="col-sm-12">
                     <div class="description">
 
                         <p>
@@ -57,7 +65,7 @@
 		<div ui-view></div>
 
         <div class="row">
-            <div class="col-xs-12 ads">
+            <div class="col-sm-12 ads">
                 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
                 <!-- Ränta -->
                 <ins class="adsbygoogle"
@@ -72,24 +80,24 @@
     </div>
 
 
-
+<!--
     <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
         <div class="container">
             &copy; <a href="http://codespark.se">Codespark.se</a>
         </div>
-    </nav>
+    </nav>-->
 	
 	<script type="text/ng-template" id="pl.html">
 	
 		<div class="row">
-            <div class="col-xs-6">
+            <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <span contenteditable>Premier league</span>
                     </div>
 					
 					<div class="panel-body">
-                        <div class="row col-md-12">
+                        <div class="row col-sm-12">
 							<table class="table table-condensed">
 								<thead>
 								<tr>
@@ -123,7 +131,7 @@
 					
 				</div>
 			</div>
-			<div class="col-xs-6">
+			<div class="col-sm-6">
 			
 			 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -180,14 +188,14 @@
 	<script type="text/ng-template" id="chooseleague.html">
  
 		<div class="row">
-            <div class="col-md-12">
+            <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <span contenteditable>Choose league</span>
                     </div>
 					
 					<div class="panel-body">
-                        <div class="row col-md-12">
+                        <div class="row col-sm-12">
 							<table class="table">
 								
 								<tbody>
