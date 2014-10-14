@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html ng-app="forecastApp">
 <head>
-    <title>League forecast - Anticpate the outcome of your favorite football league</title>
+    <title>League forecast - Anticipate the outcome of your favourite football league</title>
     <meta name="description" content="">
 
     <meta charset="utf-8">
 	
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Bootstrap -->
     <link href="content/css/bootstrap.min.css" rel="stylesheet">
     <link href="content/css/forecast.css" rel="stylesheet">
 	<link href="content/css/angular.rangeSlider.css" rel="stylesheet">
 <style type="text/css">
 	div.panel-body table td { vertical-align:middle; }
+	
 </style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -24,22 +25,8 @@
 </head>
 <body>
 
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container-fluid">
-  
-  <div id="bs-example-navbar-collapse-6" class="collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-          </ul>
-        </div>
-  
-    
-  </div>
-</nav>
 
-
+<div class="content">
     <header>
         <div class="container">
             <div class="row">
@@ -70,8 +57,11 @@
     </header>
 
     <div class="container">
-        
-		<div ui-view></div>
+	
+
+        <div class="row">
+			<div ui-view></div>
+		</div>
 
         <div class="row">
             <div class="col-sm-12 ads">
@@ -87,22 +77,29 @@
             </div>
         </div>
     </div>
+	
+	<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+		<div class="container" style="text-align:center;">
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#">Table</a></li>
+					<li><a href="#">Fixtures</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
+</div>
 
-
-<!--
-    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
-        <div class="container">
-            &copy; <a href="http://codespark.se">Codespark.se</a>
-        </div>
-    </nav>-->
 	
 	<script type="text/ng-template" id="pl.html">
 	
 		<div class="row">
-            <div class="col-sm-6 col-xs-12">
+			
+            <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <span contenteditable>Premier league</span>
+                        <span>Premier league</span>
                     </div>
 					
 					<div class="panel-body">
@@ -140,7 +137,7 @@
 					
 				</div>
 			</div>
-			<div class="col-sm-6 col-xs-12">
+			<div class="col-sm-6">
 			
 			 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -168,11 +165,11 @@
 									<td><a ng-click="fixture.incrementScore(true);calculatePositionOfTeams()">{{fixture.home.name}}</a></td>
 									<td>
 										
-										<input type="text" ng-change="fixture.calculateScore();calculatePositionOfTeams()" ng-model="fixture.homeScore" class="form-control input-sm" style="width:35px;display:inline;">
+										<input type="text" ng-change="fixture.calculateScore();calculatePositionOfTeams();" ng-model="fixture.homeScore" class="form-control input-sm" style="width:35px;display:inline;">
 										
 										
 									</td>
-									<td><input type="text" ng-change="fixture.calculateScore();calculatePositionOfTeams()" ng-model="fixture.awayScore" class="form-control input-sm" style="width:35px;display:inline;"></td>
+									<td><input type="text" ng-change="fixture.calculateScore();calculatePositionOfTeams();" ng-model="fixture.awayScore" class="form-control input-sm" style="width:35px;display:inline;"></td>
 									<!--<td><span ng-show="fixture.changed">{{fixture.originalHomeScore}}-{{fixture.originalAwayScore}}</span></td>-->
 									<td><a ng-click="fixture.incrementScore(false);calculatePositionOfTeams()">{{fixture.away.name}}</a></td>
 									
@@ -183,7 +180,7 @@
 						<div ng-show="hasFixtures()" range-slider on-handle-up="filterFixturesByDate()" min="0" max="dateRange.max" filter="toReadableDate" filter-options="{{dateRange.startDate}}" model-min="dateRange.from" model-max="dateRange.to"></div>
 			
 						</div>
-						<div ui-view></div>
+						
 					
 				</div>
 			

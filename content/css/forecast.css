@@ -29,15 +29,6 @@
   font-weight: 700;
   src: local('Oswald Bold'), local('Oswald-Bold'), url(http://themes.googleusercontent.com/static/fonts/oswald/v8/bH7276GfdCjMjApa_dkG6T8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
 }
-/*
-@font-face {
-  font-family: 'FontAwesome';
-  src: url('../fonts/fontawesome-webfont.eot?v=4.0.3');
-  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.0.3') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff?v=4.0.3') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.0.3') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}
-*/
 
 
 body {
@@ -54,9 +45,6 @@ h1 {
     font-family: Oswald, Arial;
 }
 
-.container {
-     min-width:800px;
-}
 
 .logo-icon {
     font-size: 100px;
@@ -85,22 +73,6 @@ header {
     opacity: 0.3;
 }
 
-.locked {
-    z-index: 1000;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: auto;
-    text-align: center;
-    top: 0;
-    bottom: 0;
-    height: 80px;
-}
-
-.navbar {
-    min-height: 32px;
-    text-align: right;
-}
 
 .dropdown-menu {
     display: block;
@@ -126,11 +98,6 @@ table {
 
 .Installment {
     font-size:10px;
-}
-
-.overviewContainer {
-    max-height:400px;
-    overflow:auto;
 }
 
 

@@ -69,7 +69,6 @@ forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams',
 
 forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', 'league', function ($scope, $stateParams, $http, league) {
 
-
 	league.calculateTable();
 	league.calculatePositionOfTeams({setStartPosition: true});
 
@@ -105,7 +104,6 @@ forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', '
 
 	
 	$scope.updateFixtures = function() {
-		
 		var selectedTeams = $scope.teams.filter(function(n) { return n.selected; });
 		if(!(selectedTeams == 0 || selectedTeams.length == $scope.teams.length)) {
 			$scope.allSelected = false;
@@ -120,7 +118,6 @@ forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', '
 		}
 		
 		$scope.fixtures = fixtures;
-	
 	};
 	
 	$scope.hasFixtures = function() {
@@ -169,8 +166,6 @@ var Fixture = function(home, away, date, scores) {
 		result: ""
 	};
  
-	this.scoreState = 0;
- 
 	this.incrementScore = function(homeTeam){
 		if(homeTeam) {
 			this.homeScore++;
@@ -178,7 +173,7 @@ var Fixture = function(home, away, date, scores) {
 			this.awayScore++;
 		}
 
-		this.calculatScore();
+		this.calculateScore();
 	};
 	
 	this.teamsPlaying = function(teams){
@@ -198,14 +193,14 @@ var Fixture = function(home, away, date, scores) {
 		return teamId == this.home.id || teamId == this.away.id;
 	};
 	
-	this.calculatScore = function(){
+	this.calculateScore = function(){
 		this.changed = true;
 		this.calculate();
 	};
  
 	this.calculate = function() {
 
-		if(!this.homeScore && !this.awayScore) {
+		if(this.homeScore == null && this.awayScore == null) {
 			return;
 		}
 		
@@ -270,7 +265,7 @@ var Team = function(name, id) {
 	this.name = name;
 	this.id = id;
 	
-	this.ponts = this.wins = this.draws = this.defeats = this.startPosition = this.currentPosition = this.scoreDiff = 0;
+	this.points = this.wins = this.draws = this.defeats = this.startPosition = this.currentPosition = this.scoreDiff = 0;
 	
 	this.selected = false;
 	
@@ -279,6 +274,10 @@ var Team = function(name, id) {
 	};
 	
 	this.calculatePoints = function() {
+		if(this.name == "Halmstads BK") {
+			console.log('wins', this.wins);
+			console.log('draws', this.draws);
+		}
 		this.points = (this.wins*3)+(this.draws*1);
 		return this.points;
 	};
