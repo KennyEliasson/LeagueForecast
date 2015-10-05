@@ -98,15 +98,15 @@
             <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <span>{{leagueName}}</span>
+                        <span>Premier league</span>
                     </div>
 					
 					<div class="panel-body">
-							<div ui-view></div>
+                        
 							<table class="table table-condensed">
 								<thead>
 								<tr>
-									<th></th>
+									<th><input type="checkbox" ng-change="selectAll()" ng-model="allSelected"></th>
 									<th>#</th>
 									<th></th>
 									<th></th>
@@ -122,7 +122,7 @@
 										<td><input type="checkbox" ng-change="updateFixtures()" ng-model="team.selected"></td>
 										<td>{{$index+1}}</td>
 										<td><span class="label" ng-class="{'label-success': team.hasBetterPosition(), 'label-danger': team.hasWorsePosition() }">{{team.currentPosition-team.startPosition}}</span></td>
-										<td><a href="#/league/{{leagueIdentifier}}/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
+										<td><a href="#/league/{{league}}/team/{{team.name}}/{{team.id}}">{{team.name}}</a></td>
 										<td>{{team.wins}}</td>
 										<td>{{team.draws}}</td>
 										<td>{{team.defeats}}</td>

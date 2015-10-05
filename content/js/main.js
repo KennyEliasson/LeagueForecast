@@ -6,17 +6,17 @@ forecastApp.config(['$stateProvider', '$urlRouterProvider',
 	$urlRouterProvider.otherwise("/");
 	$stateProvider
     .state('league', {
-      url: "/league/:leagueName"/*?teamName&teamId"*/,
+      url: "/league/:leagueName",
       templateUrl: "pl.html",
 	  controller: 'LeagueController',
 	  resolve: {
 		league: function($stateParams, $http, $q){
-			
 			var deferred = $q.defer();
+			
 			var leagueName = $stateParams.leagueName;
 		
 			$http.get("content/data/" + leagueName + "/league.json").success(function(data) {
-				var league = new League(data.name, leagueName);
+				var league = new League(data.name);
 				for(var i = 0;i<data.teams.length;i++) {
 					league.addTeam(data.teams[i].name, data.teams[i].id);
 				}
@@ -32,10 +32,9 @@ forecastApp.config(['$stateProvider', '$urlRouterProvider',
 			return deferred.promise;
 		}
 	  }
-    }).state('league.teams', {
-      url: "/team/:teamName/:teamId",
-	  template: '',
-	  controller: 'LeagueController',
+    }).state('league.team', {
+      url: "/team/:team/:teamId",
+      controller: 'FixtureController'
 	}).state('index', {
       url: "/",
       templateUrl: "chooseleague.html",
@@ -57,25 +56,23 @@ forecastApp.controller("StartController", ['$scope', '$location', function ($sco
 	
 }]);
 
+forecastApp.controller("FixtureController",  ['$scope', '$http', '$stateParams', function ($scope, $http, $stateParams) {
+	$scope.setAllSelected(false);
+	
+	for(var i = 0;i<$scope.teams.length;i++) {
+		$scope.teams[i].selected = $scope.teams[i].id == $stateParams.teamId;
+	}
+	
+	$scope.updateFixtures();
+}]);
+
 
 forecastApp.controller("LeagueController", ['$scope', '$stateParams', '$http', 'league', function ($scope, $stateParams, $http, league) {
-console.log('hello?', $stateParams);
 
-	if($stateParams.teamId) {
-		for(var i = 0;i<league.teams.length;i++) {
-			league.teams[i].selected = league.teams[i].id == $stateParams.teamId;
-		}
-		$scope.updateFixtures();
-	}
-
-	$scope.leagueIdentifier = league.identifier;
-	$scope.leagueName = league.name;
 	league.calculateTable();
 	league.calculatePositionOfTeams({setStartPosition: true});
 
 	$scope.teams = league.teams;
-	
-	
 	$scope.fixtures = league.fixtures;
 	$scope.dateRange = {
 		startDate: +league.startDate, //To Epoch
@@ -88,7 +85,18 @@ console.log('hello?', $stateParams);
 		return team.sortValue();
 	}
 	
+	$scope.allSelected = false;
+	$scope.setAllSelected = function(state){
+		$scope.allSelected = state;
+	};
 	
+	$scope.selectAll = function(){
+		for(var i = 0;i<league.teams.length;i++) {
+			league.teams[i].selected = $scope.allSelected;
+		}
+		
+		$scope.updateFixtures();
+	};
 	
 	$scope.calculatePositionOfTeams = function() {
 		league.calculatePositionOfTeams();
@@ -246,7 +254,6 @@ var Fixture = function(home, away, date, scores) {
  
 	this.isPlayedBetween = function(start, end) {
 		if(!start) {
-		console.log('no start');
 			return;
 		}
 		return this.date.between(start,end);
@@ -267,6 +274,10 @@ var Team = function(name, id) {
 	};
 	
 	this.calculatePoints = function() {
+		if(this.name == "Halmstads BK") {
+			console.log('wins', this.wins);
+			console.log('draws', this.draws);
+		}
 		this.points = (this.wins*3)+(this.draws*1);
 		return this.points;
 	};
@@ -284,12 +295,9 @@ var Team = function(name, id) {
 	};
 }
 
-var League = function(name, identifier) {
+var League = function(name) {
 	this.name = name;
-	this.identifier = identifier;
 	
-	
-	//Måste fixa datum-spanet! :P
 	this.startDate = new Date(2013, 8, 7);
 	var endDate = new Date(2014, 4, 23);
 
