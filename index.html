@@ -8,12 +8,13 @@
 	
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Bootstrap -->
+    <link href="content/css/bootstrap.min.css" rel="stylesheet">
+    <link href="content/css/forecast.css" rel="stylesheet">
+	<link href="content/css/angular.rangeSlider.css" rel="stylesheet">
+<style type="text/css">
+	div.panel-body table td { vertical-align:middle; }
 	
-	<link href="build/css/bundle.css" rel="stylesheet">
-
-	<style type="text/css">
-		div.panel-body table td { vertical-align:middle; }	
-	</style>
+</style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -179,9 +180,11 @@
 						<div ng-show="hasFixtures()" range-slider on-handle-up="filterFixturesByDate()" min="0" max="dateRange.max" filter="toReadableDate" filter-options="{{dateRange.startDate}}" model-min="dateRange.from" model-max="dateRange.to"></div>
 			
 						</div>
-
+						
+					
 				</div>
-
+			
+				
 			</div>
 		</div>
 	
@@ -216,12 +219,9 @@
  
     </script>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+	<script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
 	
-	<script src="build/js/output.js"></script>
-	<!--
-	<script src="js/libs/angular.js"></script>
-	<script src="js/libs/angular-ui-router.min.js"></script>
-	-->
 <!--
     <script type="text/javascript">
 
@@ -236,11 +236,10 @@
         ga('send', 'pageview');
 
     </script>-->
-<!--
-	<script src="js/libs/angularLocalStorage.js?v=1"></script>
-	<script src="js/libs/angular.rangeSlider.js?v=1"></script>
-    <script src="js/main.js?v=1"></script>
-	-->
+
+	<script src="content/js/angularLocalStorage.js?v=1"></script>
+    <script src="content/js/main.js?v=1"></script>
+	<script src="content/js/angular.rangeSlider.js?v=1"></script>
 
 </body>
 </html>

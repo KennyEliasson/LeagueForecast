@@ -213,7 +213,3 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-
-#bower och node
-bower_components/
-node_modules/
