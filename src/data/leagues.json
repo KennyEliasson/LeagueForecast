@@ -1,0 +1,20 @@
+{
+  "leagues": [
+    { 
+      "id": "pl" ,
+      "name": "Premier League",
+      "description": "The best league in the world?",
+      "seasons": [
+          { "id": "13-14", "name": "Season 13/14", "description": "Manchester City won the league, but how would it turned out if Spurs won the NLD against Arsenal?" }
+      ]
+    },
+    { 
+      "id": "allsvenskan" ,
+      "name": "Allsvenskan",
+      "description": "Not the best league in the world :)",
+      "seasons": [
+          { "id": "17", "name": "Season 13", "description": "Will Malmö continue winning this season?" }
+      ]
+    }
+  ]
+}
