@@ -1,4 +1,4 @@
-# leagueforecast
+# tableshuffle
 
 > Change the history of matches
 
