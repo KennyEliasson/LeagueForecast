@@ -17,7 +17,7 @@ module.exports = {
   ],
   // add your custom rules here
   'rules': {
-    "curly": ["error", "multi", "consistent"],
+    "curly": ["error", "all"],
     "keyword-spacing": ["error", { 
         "overrides": {
           "if": { "after": false },

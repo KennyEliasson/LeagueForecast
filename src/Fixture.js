@@ -31,26 +31,30 @@ export default class Fixture {
 
   incrementScoreByTeam (team, scoreSteps) {
     var score = 1;
-    if(scoreSteps !== undefined)
+    if(scoreSteps !== undefined) {
       score = scoreSteps;
+    }
 
     var teamId = team;
-    if(team.id)
+    if(team.id) {
       teamId = team.id;
+    }
 
-    if(this.home.id === teamId)
+    if(this.home.id === teamId) {
       this.homeScore += score;
-    else if(this.away.id === teamId)
+    } else if(this.away.id === teamId) {
       this.awayScore += score;
+    }
 
     this.calculateScore();
   };
 
   incrementScore (homeTeam) {
-    if(homeTeam)
+    if(homeTeam) {
       this.homeScore++;
-    else
+    } else {
       this.awayScore++;
+    }
 
     this.calculateScore();
   };
@@ -58,15 +62,29 @@ export default class Fixture {
   teamsPlaying (teams) {
     for(var i = 0; i < teams.length; i++) {
       var hit = this.teamPlaying(teams[i]);
-      if(hit) return true;
+      if(hit) {
+        return true;
+      }
     }
     return false;
   };
 
+  teamsPlayingAgainstEachOther (teams) {
+    var hits = 0;
+    for(var i = 0; i < teams.length; i++) {
+      if(this.teamPlaying(teams[i])) {
+        hits++;
+      }
+    }
+
+    return hits === 2;
+  };
+
   teamPlaying (team) {
     var teamId = team;
-    if(team.id)
+    if(team.id) {
       teamId = team.id;
+    }
 
     return teamId === this.home.id || teamId === this.away.id;
   };
@@ -86,8 +104,9 @@ export default class Fixture {
   };
 
   calculate () {
-    if(this.homeScore == null && this.awayScore == null)
+    if(this.homeScore == null && this.awayScore == null) {
       return;
+    }
 
     // Reset before calculating again
     if(this.state.result === 1) {
@@ -101,11 +120,13 @@ export default class Fixture {
       this.away.draws--;
     }
 
-    if(!this.homeScore)
+    if(!this.homeScore) {
       this.homeScore = 0;
+    }
 
-    if(!this.awayScore)
+    if(!this.awayScore) {
       this.awayScore = 0;
+    }
 
     this.home.calculateScoreDiff(-(this.state.homeScore - this.state.awayScore));
     this.away.calculateScoreDiff(-(this.state.awayScore - this.state.homeScore));

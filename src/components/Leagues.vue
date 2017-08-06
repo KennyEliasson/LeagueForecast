@@ -10,7 +10,7 @@
     <p>{{league.description}}</p>
 
     <div class="list-group">
-      <router-link :to="{ name: 'League', params: { name: league.id, season: season.id }}" class="list-group-item" v-for="season in league.seasons">
+      <router-link :to="{ name: 'League', params: { name: league.id, season: season.id }}" class="list-group-item" v-for="season in league.seasons" v-bind:key="season.name">
         <h4 class="list-group-item-heading">{{season.name}}</h4>
         <p class="list-group-item-text">{{season.description}}</p>
       </router-link>

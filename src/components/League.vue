@@ -5,13 +5,15 @@
 
     <div class="col-md-6">
       <div class="panel panel-default">
-        <div class="panel-heading">Table</div>
+        <div class="panel-heading">
+          Table
+          <button class="btn btn-xs btn-primary pull-right">Save</button>
+        </div>
         <div class="panel-body">
 
-          <table class="table">
+          <table class="table table-condensed">
             <thead>
               <tr>
-                <th></th>
                 <th>#</th>
                 <th></th>
                 <th></th>
@@ -24,10 +26,9 @@
             </thead>
             <tbody>
               <tr v-for="(team, index) in sortedTeamsByPoint">
-                <td><input type="checkbox" name="selectedTeams" :value="team.id" v-model="selectedTeams"></td>
                 <td>{{index+1}}</td>
                 <td><span class="label" v-bind:class="{'label-success': team.hasBetterPosition(index+1), 'label-danger': team.hasWorsePosition(index+1) }">{{team.startPosition-(index+1)}}</span></td>
-                <td><a>{{team.name}}</a></td>
+                <td><button class="btn btn-link btn-sm" v-on:click="chooseTeam(team)"><strong v-if="selectedTeams.indexOf(team) >= 0">{{team.name}}</strong><span v-else>{{team.name}}</span></button></td>
                 <td>{{team.wins}}</td>
                 <td>{{team.draws}}</td>
                 <td>{{team.defeats}}</td>
@@ -42,7 +43,7 @@
     </div>
 
     <div class="col-md-6">
-      <FixtureList :fixtures="visibleFixtures" title="Selected teams fixtures" no-fixtures-text="Select a team to show fixtures"></FixtureList>
+      <FixtureList :fixtures="visibleFixtures" title="Selected fixtures" no-fixtures-text="Click on a team to show fixtures"></FixtureList>
       <FixtureList :fixtures="changedFixtures" v-show="changedFixtures.length > 0" title="Changed fixtures" no-fixtures-text="No changed matches"></FixtureList>
     </div>
 
@@ -69,11 +70,13 @@ export default {
     .then(([fixtures, leagueData]) => {
       var league = new League(leagueData.name, leagueId);
       var leagueDataTeams = leagueData.teams;
-      for(var i = 0; i < leagueDataTeams.length; i++)
+      for(var i = 0; i < leagueDataTeams.length; i++) {
         league.addTeam(leagueDataTeams[i].name, leagueDataTeams[i].id);
+      }
 
-      for(i = 0; i < fixtures.length; i++)
+      for(i = 0; i < fixtures.length; i++) {
         league.addFixture(fixtures[i]);
+      }
 
       league.setStartPositionOfTeams();
 
@@ -96,6 +99,17 @@ export default {
       league: { teams: [], fixtures: [] }
     };
   },
+  methods: {
+    chooseTeam (team) {
+      if(this.selectedTeams.indexOf(team) >= 0) {
+        this.selectedTeams.splice(this.selectedTeams.indexOf(team), 1);
+      } else {
+        this.selectedTeams.push(team);
+      }
+
+      this.selectedTeams.map((team) => console.log(team.name));
+    }
+  },
   computed: {
     changedFixtures () {
       return this.league.fixtures.filter((fixture) => {
@@ -103,8 +117,18 @@ export default {
       });
     },
     visibleFixtures () {
+      if(this.selectedTeams == null || this.selectedTeams.length === 0) {
+        return [];
+      }
+
+      if(this.selectedTeams.length === 1) {
+        return this.league.fixtures.filter((fixture) => {
+          return fixture.teamPlaying(this.selectedTeams[0]);
+        });
+      }
+
       return this.league.fixtures.filter((fixture) => {
-        return fixture.teamsPlaying(this.selectedTeams);
+        return fixture.teamsPlayingAgainstEachOther(this.selectedTeams);
       });
     },
     sortedTeamsByPoint () {
@@ -118,5 +142,9 @@ export default {
 <<style scoped>
 .btn-xs .glyphicon {
   font-size: 8px;
+}
+
+.clickable {
+  cursor:pointer;
 }
 </style>

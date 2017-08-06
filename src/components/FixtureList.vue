@@ -20,19 +20,37 @@
         </thead>
         <tbody>
           <tr v-for="fixture in fixtures">
-            <td><a v-on:click="fixture.incrementScoreByTeam(fixture.home)">{{fixture.home.name}}</a></td>
             <td>
-              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.home, -1)"><span class="glyphicon glyphicon-minus"></span></button> 
+              <button class="btn btn-link" v-on:click="fixture.incrementScoreByTeam(fixture.home)">
+                <strong v-if="fixture.home == selectedTeam">
+                  {{fixture.home.name}}
+                </strong>
+                <span v-else>
+                  {{fixture.home.name}}
+                </span>
+              </button>
+            </td>
+            <td>
+              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.home, -1)">-</button> 
               {{fixture.homeScore}}
-              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.home)"><span class="glyphicon glyphicon-plus"></span></button>
+              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.home)">+</button>
             </td>
             <td>
-              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.away, -1)"><span class="glyphicon glyphicon-minus"></span></button> 
+              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.away, -1)">-</button> 
               {{fixture.awayScore}}
-              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.away)"><span class="glyphicon glyphicon-plus"></span></button>
+              <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.away)">+</button>
             </td>
-            <td><a v-on:click="fixture.incrementScoreByTeam(fixture.away)">{{fixture.away.name}}</a></td>
-            <td><a v-show="fixture.changed" v-on:click="fixture.reset()" class="btn btn-xs btn-danger">Reset</a></td>
+            <td>
+              <button class="btn btn-link"  v-on:click="fixture.incrementScoreByTeam(fixture.away)">
+                <strong v-if="fixture.away == selectedTeam">
+                  {{fixture.away.name}}
+                </strong>
+                <span v-else>
+                  {{fixture.away.name}}
+                </span>
+              </button>
+            </td>
+            <td><a v-show="fixture.changed" v-on:click="fixture.reset()" class="btn btn-xs btn-danger">X</a></td>
           </tr>
         </tbody>
       </table>
@@ -46,7 +64,8 @@ export default {
   props: {
     fixtures: Array,
     noFixturesText: String,
-    title: String
+    title: String,
+    selectedTeam: Object
   }
 };
 </script>
