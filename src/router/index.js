@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-// import Hello from '@/components/Hello';
 import Leagues from '@/components/Leagues';
 import League from '@/components/League';
 

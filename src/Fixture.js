@@ -4,14 +4,13 @@ export default class Fixture {
     this.home = home;
     this.away = away;
 
-    if(scores) {
-      this.homeScore = scores[0];
-      this.awayScore = scores[1];
-      this.originalHomeScore = this.homeScore;
-      this.originalAwayScore = this.awayScore;
+    if(scores && scores[0]) {
+      this.homeScore = this.originalHomeScore = parseInt(scores[0]);
+      this.awayScore = this.originalAwayScore = parseInt(scores[1]);
     } else {
-      this.homeScore = '';
-      this.awayScore = '';
+      this.unplayed = true;
+      this.homeScore = this.originalHomeScore = null;
+      this.awayScore = this.originalAwayScore = null;
     }
 
     this.changed = false;
@@ -95,19 +94,13 @@ export default class Fixture {
   };
 
   reset () {
-    if(this.originalHomeScore >= 0 && this.originalAwayScore >= 0) {
-      this.changed = false;
-      this.homeScore = this.originalHomeScore;
-      this.awayScore = this.originalAwayScore;
-      this.calculate();
-    }
+    this.changed = false;
+    this.homeScore = this.originalHomeScore;
+    this.awayScore = this.originalAwayScore;
+    this.calculate();
   };
 
   calculate () {
-    if(this.homeScore == null && this.awayScore == null) {
-      return;
-    }
-
     // Reset before calculating again
     if(this.state.result === 1) {
       this.home.wins--;
@@ -120,16 +113,14 @@ export default class Fixture {
       this.away.draws--;
     }
 
-    if(!this.homeScore) {
-      this.homeScore = 0;
-    }
-
-    if(!this.awayScore) {
-      this.awayScore = 0;
-    }
-
     this.home.calculateScoreDiff(-(this.state.homeScore - this.state.awayScore));
     this.away.calculateScoreDiff(-(this.state.awayScore - this.state.homeScore));
+
+    if(this.homeScore == null && this.awayScore == null) {
+      this.home.calculatePoints();
+      this.away.calculatePoints();
+      return;
+    }
 
     // Recalculate with new score
     if(this.homeScore > this.awayScore) {

@@ -2,11 +2,12 @@ import Team from './Team';
 import Fixture from './Fixture';
 
 export default class League {
-  constructor (name, id) {
+  constructor (name, id, season) {
     this.name = name;
     this.identifier = id;
+    this.season = season;
 
-    this.startDate = new Date(2013, 8, 7);
+    // this.startDate = new Date(2013, 8, 7);
     // var endDate = new Date(2014, 4, 23);
 
     // this.seasonLengthInDays = this.startDate.daysTo(endDate);
@@ -18,6 +19,9 @@ export default class League {
   };
 
   addTeam (name, id) {
+    if(!id) {
+      id = name;
+    }
     var team = new Team(name, id);
     this.teams.push(team);
     this.teamLookup[name.replace(' ', '')] = team;
@@ -26,8 +30,9 @@ export default class League {
   setStartPositionOfTeams () {
     this.calculateTable();
     var sortedTeamsByPoints = this.teams.slice(0).sort((a, b) => { return b.sortValue() - a.sortValue(); });
-    for(var i = 0; i < sortedTeamsByPoints.length; i++)
+    for(var i = 0; i < sortedTeamsByPoints.length; i++) {
       sortedTeamsByPoints[i].startPosition = i + 1;
+    }
   };
 
   addFixture (fixture) {
@@ -38,8 +43,9 @@ export default class League {
   };
 
   calculateTable () {
-    for(var i = 0; i < this.fixtures.length; i++)
+    for(var i = 0; i < this.fixtures.length; i++) {
       this.fixtures[i].calculate();
+    }
   };
 
   shuffle (shuffleData) {

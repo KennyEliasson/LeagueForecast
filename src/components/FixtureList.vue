@@ -2,8 +2,10 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       {{ title }}
+      <button v-if="canSave" class="btn btn-xs btn-primary pull-right">Save</button>
     </div>
     <div class="panel-body">
+      
       <div v-show="fixtures.length < 1">
         {{ noFixturesText }}
       </div>
@@ -32,12 +34,12 @@
             </td>
             <td>
               <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.home, -1)">-</button> 
-              {{fixture.homeScore}}
+              {{drawScore(fixture.homeScore)}}
               <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.home)">+</button>
             </td>
             <td>
               <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.away, -1)">-</button> 
-              {{fixture.awayScore}}
+              {{drawScore(fixture.awayScore)}}
               <button class="btn btn-xs" v-on:click="fixture.incrementScoreByTeam(fixture.away)">+</button>
             </td>
             <td>
@@ -65,7 +67,17 @@ export default {
     fixtures: Array,
     noFixturesText: String,
     title: String,
-    selectedTeam: Object
+    selectedTeam: Object,
+    canSave: Boolean
+  },
+  methods: {
+    drawScore (score) {
+      if(score === null) {
+        return '-';
+      }
+
+      return score;
+    }
   }
 };
 </script>
